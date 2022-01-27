@@ -1,6 +1,9 @@
+from ninja import Ninja
+
 
 def main():
-    print('done')
+    n = Ninja('Scourge')
+    print(n.get_skill_gems())
 
 
 if __name__ == '__main__':
