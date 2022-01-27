@@ -1,0 +1,1 @@
+This script is intended to calculate the optimal gems to level for profit
