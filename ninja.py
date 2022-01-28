@@ -1,6 +1,8 @@
 # This handles all the interaction with the poe ninja api
 
 import requests
+import json
+from items import Gem
 
 class Ninja:
     """
@@ -40,5 +42,17 @@ class Ninja:
         else:
             return ''
 
+
     def get_skill_gems(self):
-        return self._make_request('SkillGem')
+        """ Return a list of Gems
+
+        """
+
+        items = self._make_request('SkillGem')
+
+        gems = []
+        for item in items['lines']:
+            gems.append(Gem(item))
+
+
+        return gems
