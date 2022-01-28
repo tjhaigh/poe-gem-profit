@@ -2,9 +2,15 @@ class Gem():
     """
     Base class for gems
     """
+    # Constants for total exp required for each gem type
+    EXP_EXCEPTIONAL = 1666045137
+    EXP_AWAKENED = 1920762677
+    EXP_BASE = 342039899
 
     _alt_quals = ['divergent', 'anomalous', 'phantasmal']
+    _exceptional_supports = ['enlighten', 'empower', 'enhance']
     profit = 0
+    profit_per_exp = 0
 
     def __init__(self, data):
         """ Constructor
@@ -22,6 +28,8 @@ class Gem():
         self.is_awakened = True if 'awakened' in self.details else False
         self.is_alt_quality = any((True for x in self._alt_quals if x in self.details))
         self.is_double_corrupted = self._check_double_corrupted()
+
+        self.required_exp = self._calc_required_exp()
 
 
     def _process_variant(self, variant):
@@ -66,3 +74,14 @@ class Gem():
             return True
         else:
             return False
+
+    def _calc_required_exp(self):
+        if self.is_awakened:
+            return self.EXP_AWAKENED
+        elif any((True for x in self._exceptional_supports if x in self.details)):
+            return self.EXP_EXCEPTIONAL
+        elif self.quality >= 20:
+            # 20 qual gems need to be levelled twice
+            return self.EXP_BASE * 2
+        else:
+            return self.EXP_BASE

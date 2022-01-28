@@ -1,5 +1,6 @@
 import argparse
 from ninja import Ninja
+from tabulate import tabulate
 
 
 def main(args):
@@ -33,22 +34,32 @@ def filter_gems(gems, include_awakened, include_alt_quality, include_double_corr
 
 def calc_profit(gems):
     for gem in gems:
-        base = [g for g in gems if gem.name == g.name and g.level == 1 and g.quality == 0 and g.corrupted == False]
-        if len(base) == 1:
-            base = base[0]
-            gem.profit = gem.chaos_value - base.chaos_value
+        variations = [g for g in gems if gem.name == g.name]
+        base = [g for g in variations if g.level == 1 and g.quality == 0 and g.corrupted == False]
+        # vaal gems rarely have a level 1 so we just don't calc profit for them
+        # TODO: handle vaal gems
+        if base == []:
+            continue
+        base = base[0]
+
+        gem.profit = gem.chaos_value - base.chaos_value
+        if gem.corrupted:
+            gem.profit = gem.profit / 8
+        gem.profit_per_exp = gem.profit / gem.required_exp
 
 
 def print_top_10(gems):
     """ Sorts the given gem list by chaos value and prints the top 10
 
     """
-    gems.sort(reverse=True, key=lambda gem: gem.profit)
+    gems.sort(reverse=True, key=lambda gem: gem.profit_per_exp)
     print("Top 10 gems by Profit:")
     print("-----------------------------")
-    for x in range(10):
-        gem = gems[x]
-        print(gem.name, gem.chaos_value, gem.profit, gem.level, gem.quality, gem.corrupted)
+    
+    results = [[gem.name, gem.level, gem.quality, gem.corrupted, round(gem.chaos_value), round(gem.profit), "{:.2e}".format(gem.profit_per_exp)] for gem in gems[:10]]
+    headers = ['Gem Name', 'Level', 'Quality', 'Corrupted', 'Value (chaos)', 'Profit', 'Profit per exp']
+
+    print(tabulate(results, headers=headers))
 
     
 
