@@ -1,6 +1,7 @@
 import argparse
 from ninja import Ninja
 from tabulate import tabulate
+import copy
 
 
 def main(args):
@@ -9,7 +10,7 @@ def main(args):
     currency = n.get_currency()
     gems = filter_gems(gems, args.include_awakened, args.include_alt_quality, 
                       args.include_double_corrupted, args.min_listings)
-    calc_profit(gems, currency)
+    gems = calc_profit(gems, currency)
     print_top_10(gems)
 
 def filter_gems(gems, include_awakened, include_alt_quality, include_double_corrupted, min_listings):
@@ -34,6 +35,8 @@ def filter_gems(gems, include_awakened, include_alt_quality, include_double_corr
 
 
 def calc_profit(gems, currency):
+    new_gems = []
+
     for gem in gems:
         variations = [g for g in gems if gem.name == g.name]
         base = [g for g in variations if g.level == 1 and g.quality == 0 and g.corrupted == False]
@@ -43,12 +46,29 @@ def calc_profit(gems, currency):
             continue
         base = base[0]
 
+     
         gem.profit = gem.chaos_value - base.chaos_value
         if gem.corrupted:
             # assumes brick is worth 0
             # TODO: handle bricks
             gem.profit = gem.profit / 8
         gem.profit_per_exp = gem.profit / gem.required_exp
+
+        # For exceptional gems, add a variation which has 20q
+        if gem.is_exceptional:
+            gcp = [c for c in currency if c.details == 'gemcutters-prism']
+            gcp = gcp[0]
+            gcp_cost = gcp.chaos_value * 20
+
+            gem_20q = copy.deepcopy(gem)
+            gem_20q.quality = 20
+            gem_20q.profit = gem_20q.chaos_value - (base.chaos_value + gcp_cost)
+            gem_20q.profit_per_exp = gem_20q.profit / (gem_20q.required_exp / 2) # exp is halved with 20q
+            new_gems.append(gem_20q)
+        
+        new_gems.append(gem)
+    
+    return new_gems
 
 
 def print_top_10(gems):

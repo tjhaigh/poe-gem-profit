@@ -27,6 +27,7 @@ class Gem:
         
         self.is_awakened = True if 'awakened' in self.details else False
         self.is_alt_quality = any((True for x in self._alt_quals if x in self.details))
+        self.is_exceptional = any((True for x in self._exceptional_supports if x in self.details))
         self.is_double_corrupted = self._check_double_corrupted()
 
         self.required_exp = self._calc_required_exp()
@@ -78,7 +79,7 @@ class Gem:
     def _calc_required_exp(self):
         if self.is_awakened:
             return self.EXP_AWAKENED
-        elif any((True for x in self._exceptional_supports if x in self.details)):
+        elif self.is_exceptional:
             return self.EXP_EXCEPTIONAL
         elif self.quality >= 20:
             # 20 qual gems need to be levelled twice
