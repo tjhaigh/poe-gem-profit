@@ -1,4 +1,4 @@
-class Gem():
+class Gem:
     """
     Base class for gems
     """

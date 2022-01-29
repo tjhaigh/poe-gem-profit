@@ -6,9 +6,10 @@ from tabulate import tabulate
 def main(args):
     n = Ninja('Scourge')
     gems = n.get_skill_gems()
+    currency = n.get_currency()
     gems = filter_gems(gems, args.include_awakened, args.include_alt_quality, 
                       args.include_double_corrupted, args.min_listings)
-    calc_profit(gems)
+    calc_profit(gems, currency)
     print_top_10(gems)
 
 def filter_gems(gems, include_awakened, include_alt_quality, include_double_corrupted, min_listings):
@@ -32,7 +33,7 @@ def filter_gems(gems, include_awakened, include_alt_quality, include_double_corr
     return new_gems
 
 
-def calc_profit(gems):
+def calc_profit(gems, currency):
     for gem in gems:
         variations = [g for g in gems if gem.name == g.name]
         base = [g for g in variations if g.level == 1 and g.quality == 0 and g.corrupted == False]
@@ -44,6 +45,8 @@ def calc_profit(gems):
 
         gem.profit = gem.chaos_value - base.chaos_value
         if gem.corrupted:
+            # assumes brick is worth 0
+            # TODO: handle bricks
             gem.profit = gem.profit / 8
         gem.profit_per_exp = gem.profit / gem.required_exp
 

@@ -2,13 +2,14 @@
 
 import requests
 import json
-from items import Gem
+from items import Gem, Currency
 
 class Ninja:
     """
     Makes requests to various 
     """
-    _ninja_base_url = 'https://poe.ninja/api/data/itemoverview'
+    _ninja_base_url_item = 'https://poe.ninja/api/data/itemoverview'
+    _ninja_base_url_currency = 'https://poe.ninja/api/data/currencyoverview'
     _valid_leagues = ['Standard', 'Scourge']
 
     def __init__(self, league='Standard'):
@@ -26,17 +27,18 @@ class Ninja:
             raise ValueError('League name: ' + league + ' is not a member of valid leagues')
 
 
-    def _make_request(self, item_type):
+    def _make_request(self, url, item_type):
         """ Makes a request to the ninja api and returns json output
 
         Args:
-            Type (str): The type of search to be made
+            url (str): The url to search request on (it's different for items and currency)
+            item_type (str): The type of search to be made
 
         Returns: Json response from poe ninja or empty string on failed request
         """
 
         params = {'league': self.league, 'type': item_type}
-        r = requests.get(self._ninja_base_url, params=params)
+        r = requests.get(url, params=params)
         if r.status_code == requests.codes.ok:
             return r.json()
         else:
@@ -48,7 +50,7 @@ class Ninja:
 
         """
 
-        items = self._make_request('SkillGem')
+        items = self._make_request(self._ninja_base_url_item, 'SkillGem')
 
         gems = []
         for item in items['lines']:
@@ -56,3 +58,15 @@ class Ninja:
 
 
         return gems
+
+    def get_currency(self):
+        """ Return a list of Currency
+        """
+
+        items = self._make_request(self._ninja_base_url_currency, 'Currency')
+
+        currency = []
+        for item in items['lines']:
+            currency.append(Currency(item))
+
+        return currency
