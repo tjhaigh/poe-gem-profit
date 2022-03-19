@@ -51,10 +51,6 @@ def calc_profit(gems, currency):
             # TODO: handle bricks
             gem.chaos_value = gem.chaos_value / 8
         gem.profit = gem.chaos_value - base.chaos_value
-        
-        if gem.name == "Enlighten Support" and gem.level == 4:
-            print(gem.chaos_value, gem.profit)
-            print(base.chaos_value, base.level, base.corrupted)
         gem.profit_per_exp = gem.profit / gem.required_exp
 
         # For exceptional gems, add a variation which has 20q
