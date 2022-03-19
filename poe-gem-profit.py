@@ -5,7 +5,7 @@ import copy
 
 
 def main(args):
-    n = Ninja('Scourge')
+    n = Ninja('Archnemesis')
     gems = n.get_skill_gems()
     currency = n.get_currency()
     gems = filter_gems(gems, args.include_awakened, args.include_alt_quality, 
@@ -46,12 +46,15 @@ def calc_profit(gems, currency):
             continue
         base = base[0]
 
-     
-        gem.profit = gem.chaos_value - base.chaos_value
         if gem.corrupted:
             # assumes brick is worth 0
             # TODO: handle bricks
-            gem.profit = gem.profit / 8
+            gem.chaos_value = gem.chaos_value / 8
+        gem.profit = gem.chaos_value - base.chaos_value
+        
+        if gem.name == "Enlighten Support" and gem.level == 4:
+            print(gem.chaos_value, gem.profit)
+            print(base.chaos_value, base.level, base.corrupted)
         gem.profit_per_exp = gem.profit / gem.required_exp
 
         # For exceptional gems, add a variation which has 20q
@@ -62,7 +65,7 @@ def calc_profit(gems, currency):
 
             gem_20q = copy.deepcopy(gem)
             gem_20q.quality = 20
-            gem_20q.profit = gem_20q.chaos_value - (base.chaos_value + gcp_cost)
+            gem_20q.profit = gem_20q.profit - gcp_cost
             gem_20q.profit_per_exp = gem_20q.profit / (gem_20q.required_exp / 2) # exp is halved with 20q
             new_gems.append(gem_20q)
         
@@ -79,7 +82,7 @@ def print_top_10(gems):
     print("Top 10 gems by Profit:")
     print("-----------------------------")
     
-    results = [[gem.name, gem.level, gem.quality, gem.corrupted, round(gem.chaos_value), round(gem.profit), "{:.2e}".format(gem.profit_per_exp)] for gem in gems[:10]]
+    results = [[gem.name, gem.level, gem.quality, gem.corrupted, round(gem.chaos_value), round(gem.profit), "{:.2e}".format(gem.profit_per_exp)] for gem in gems[:20]]
     headers = ['Gem Name', 'Level', 'Quality', 'Corrupted', 'Value (chaos)', 'Profit', 'Profit per exp']
 
     print(tabulate(results, headers=headers))

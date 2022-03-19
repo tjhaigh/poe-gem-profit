@@ -10,7 +10,7 @@ class Ninja:
     """
     _ninja_base_url_item = 'https://poe.ninja/api/data/itemoverview'
     _ninja_base_url_currency = 'https://poe.ninja/api/data/currencyoverview'
-    _valid_leagues = ['Standard', 'Scourge']
+    _valid_leagues = ['Standard', 'Scourge', 'Archnemesis']
 
     def __init__(self, league='Standard'):
         self.league = league
